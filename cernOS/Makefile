@@ -1,21 +1,21 @@
 GPPPARAMS = -m32 -fno-use-cxa-atexit -nostdlib -fno-builtin -fno-rtti -fno-exceptions -fno-leading-underscore
 ASPARAMS = --32
-LDPARAMS = -mi386pe
+LDPARAMS = -melf_i386
 
-objects = loader.out kernel.exe 
+objects = loader.o gdt.o port.o interruptstubs.o interrupts.o kernel.o 
 
-%.exe: %.cpp
+%.o: %.cpp
 	g++ $(GPPPARAMS) -o $@ -c $<
 
-%.out: %.s 
+%.o: %.s 
 	as $(ASPARAMS) -o $@ $<
 
 mykernel.bin: linker.ld $(objects)
 	ld $(LDPARAMS) -T $< -o $@ $(objects)
 
 install: meykernel.bin
-	copy mykernel.bin C:\boot\mykernel.bin
-
+	sudo cp $< /boot/mykernel.bin
+	
 mykernel.iso: mykernel.bin
 	mkdir iso
 	mkdir iso/boot
@@ -29,3 +29,11 @@ mykernel.iso: mykernel.bin
 	echo '}' >> iso/boot/grub/grub.cfg
 	grub-mkrescue --output=$@ iso
 	rm -rf iso
+
+run: mykernel.iso
+	(killall virtualboxvm && sleep 1) || true 
+	virtualboxvm --startvm CernOS &
+
+.PHONY: clean
+clean:
+	rm -f $(objects) mykernel.bin mykernel.iso
