@@ -3,9 +3,28 @@
 	#include "types.h"
 	#include "port.h"
 	#include "gdt.h"
-	class InterruptManager
+	
+	class InterruptManager;
+
+	class InterruptHandler
 	{
 		protected:
+			uint8_t interruptNum;
+			InterruptManager* interruptManager;
+
+			InterruptHandler(uint8_t interruptNum, InterruptManager* interruptManager);
+			~InterruptHandler();
+		public:
+			virtual uint32_t handleInterrupt(uint32_t esp);
+
+	};
+	class InterruptManager
+	{
+		friend class InterruptHandler;
+		protected:
+			static InterruptManager* ActiveInterruptManager;
+			InterruptHandler* handlers[256];
+
 			struct GateDescriptor{
 				uint16_t handlerAddressLow;
 				uint16_t gdt_codeSegmentSelector;
@@ -34,8 +53,11 @@
 			~InterruptManager();
 
 			void Activate();
+			void Deactivate();
 
 			static uint32_t handleInterrupt(uint8_t interruptNum, uint32_t esp);
+			uint32_t DoHandleInterrupt(uint8_t interruptNum, uint32_t esp);
+
 
 			static void IgnoreInterruptRequest();
 			static void handleInterruptRequest0x00();
@@ -45,3 +67,4 @@
 	};
 
 #endif
+

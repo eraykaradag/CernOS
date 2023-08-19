@@ -1,4 +1,3 @@
-
 .set IRQ_BASE, 0x20
 
 .section .text

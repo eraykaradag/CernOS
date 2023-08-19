@@ -1,16 +1,36 @@
 #include "gdt.h"
 
-GlobalDescriptorTable::GlobalDescriptorTable():
-nullSegmentSelector(0,0,0),
+void printf(char* str);
+
+GlobalDescriptorTable::GlobalDescriptorTable()
+:nullSegmentSelector(0,0,0),
 freeSegmentSelector(0,0,0),
 codeSegmentSelector(0,64*1024*1024,0x9A),
 dataSegmentSelector(0,64*1024*1024,0x92)
 {
 	uint32_t i[2];
-	i[0] = (uint32_t)this;
-	i[1] = sizeof(GlobalDescriptorTable) << 16;
+	i[1] = (uint32_t)this;
+	i[0] = (sizeof(GlobalDescriptorTable)-1) << 16;
 
-	asm volatile("lgdt (%0)": : "p" (((uint8_t *) i)+2));
+	asm volatile(
+                "lgdt (%0)\n\t"
+                "mov %1, %%ss\n\t"
+                "mov %1, %%ds\n\t"
+                "mov %1, %%es\n\t"
+                "mov %1, %%fs\n\t"
+                "mov %1, %%gs\n\t"
+                "push %k2\n\t"
+                "push $1f\n\t"
+                "ljmp *(%%esp)\n"
+                "1:\n\t"
+                "add $8, %%esp\n\t"
+                :
+                : "r" (((uint8_t *) i)+2),
+                  "r" (DataSegmentSelector()),
+                  "r" (CodeSegmentSelector())
+                : "memory");
+
+	//printf("gdt created\n");
 }
 
 GlobalDescriptorTable::~GlobalDescriptorTable()
@@ -18,11 +38,11 @@ GlobalDescriptorTable::~GlobalDescriptorTable()
 }
 
 uint16_t GlobalDescriptorTable::DataSegmentSelector(){
-	return (uint8_t*)&dataSegmentSelector - (uint8_t*)this;
+	return (uint8_t*) &dataSegmentSelector - (uint8_t*)this;
 }
 
 uint16_t GlobalDescriptorTable::CodeSegmentSelector(){
-	return (uint8_t*)&codeSegmentSelector - (uint8_t*)this;
+	return (uint8_t*) &codeSegmentSelector - (uint8_t*)this;
 }
 
 GlobalDescriptorTable::SegmentDescriptor::SegmentDescriptor(uint32_t base, uint32_t limit, uint8_t flags){
