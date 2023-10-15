@@ -30,7 +30,7 @@ namespace cernos{
                 virtual bool SupportsMode(cernos::common::uint32_t width,cernos::common::uint32_t height, cernos::common::uint32_t colordepth);
                 virtual bool SetMode(cernos::common::uint32_t width,cernos::common::uint32_t height, cernos::common::uint32_t colordepth);
                 virtual void PutPixel(cernos::common::uint32_t x, cernos::common::uint32_t y, cernos::common::uint8_t colorIndex);
-                virtual void PutPixel(cernos::common::uint32_t x, cernos::common::uint32_t y,cernos::common::uint8_t r, cernos::common::uint8_t g, cernos::common::uint8_t b);
+                //virtual void PutPixel(cernos::common::uint32_t x, cernos::common::uint32_t y,cernos::common::uint8_t r, cernos::common::uint8_t g, cernos::common::uint8_t b);
         };
     }
 }
