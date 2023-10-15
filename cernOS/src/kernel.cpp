@@ -108,7 +108,7 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	printf("=+*##%%%#@%%@@@%%#+=====+++*###%%@@@@%%@@@@%%#####\n");
 	printf("-=+#%@@@@%##%%#%@%*+====++++*%%%@@%%*#%@@@%**+=+*#\n");
 	printf("===+**#@@@####%@@@#+=======+#%%@@%###%%%%%++=====+\n"); */
-	//printf("======+#*#%%%%@@@@*========+*##%%%##**+++===-----+\n");
+	printf("======+#*#%%%%@@@@*========+*##%%%##**+++===-----+\n");
 
 	GlobalDescriptorTable gdt;
 	InterruptManager im(&gdt);
