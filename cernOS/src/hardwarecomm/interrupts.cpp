@@ -1,6 +1,9 @@
-#include "interrupts.h"
+#include <hardwarecomm/interrupts.h>
 
-void printf(char* str);
+using namespace cernos::common;
+using namespace cernos::hardwarecomm;
+
+void printf(char*);
 void printfHex(uint8_t);
 
 InterruptHandler::InterruptHandler(uint8_t interruptNum, InterruptManager* interruptManager){

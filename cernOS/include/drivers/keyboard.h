@@ -1,28 +1,33 @@
-#ifndef __KEYBOARD_H
-#define __KEYBOARD_H
-	#include "types.h"
-	#include "port.h"
-	#include "interrupts.h"
-	#include "driver.h"
+#ifndef __CERNOS__DRIVERS__KEYBOARD_H
+#define __CERNOS__DRIVERS__KEYBOARD_H
+#include <common/types.h>
+#include <hardwarecomm/port.h>
+#include <hardwarecomm/interrupts.h>
+#include <drivers/driver.h>
+namespace cernos{
+	namespace drivers{
+		
 
-	class KeyboardEventHandler{
-	public:
-		KeyboardEventHandler();
-
-		virtual void OnKeyDown(char);
-		virtual void OnKeyUp(char);
-	};
-
-	class KeyboardDriver : public InterruptHandler, public Driver
-	{
-		Port8bit dataPort;
-		Port8bit cmdPort;
-
-		KeyboardEventHandler* handler;
+		class KeyboardEventHandler{
 		public:
-			KeyboardDriver(InterruptManager* interruptManager, KeyboardEventHandler* handler);
-			~KeyboardDriver();
-			virtual uint32_t handleInterrupt(uint32_t esp);
-			virtual void Activate();
-	};
+			KeyboardEventHandler();
+
+			virtual void OnKeyDown(char);
+			virtual void OnKeyUp(char);
+		};
+
+		class KeyboardDriver : public cernos::hardwarecomm::InterruptHandler, public Driver
+		{
+			cernos::hardwarecomm::Port8bit dataPort;
+			cernos::hardwarecomm::Port8bit cmdPort;
+
+			KeyboardEventHandler* handler;
+			public:
+				KeyboardDriver(cernos::hardwarecomm::InterruptManager* interruptManager, KeyboardEventHandler* handler);
+				~KeyboardDriver();
+				virtual cernos::common::uint32_t handleInterrupt(cernos::common::uint32_t esp);
+				virtual void Activate();
+		};
+	}
+}
 #endif

@@ -1,4 +1,7 @@
-#include "port.h"
+#include <hardwarecomm/port.h>
+
+using namespace cernos::common;
+using namespace cernos::hardwarecomm;
 
 Port::Port(uint16_t portNum){
 	this->portNum = portNum;

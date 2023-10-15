@@ -1,4 +1,9 @@
-#include "mouse.h"
+#include <drivers/mouse.h>
+
+using namespace cernos::common;
+using namespace cernos::drivers;
+using namespace cernos::hardwarecomm;
+
 MouseDriver::MouseDriver(InterruptManager* interruptManager)
 :InterruptHandler(0x2C,interruptManager),
 dataPort(0x60),

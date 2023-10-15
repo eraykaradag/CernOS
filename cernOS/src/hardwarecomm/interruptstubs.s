@@ -2,20 +2,20 @@
 
 .section .text
 
-.extern _ZN16InterruptManager15handleInterruptEhj
+.extern _ZN6cernos12hardwarecomm16InterruptManager15handleInterruptEhj
 
-.global _ZN16InterruptManager22IgnoreInterruptRequestEv
+.global _ZN6cernos12hardwarecomm16InterruptManager22IgnoreInterruptRequestEv
 
 .macro handleException num
-.global _ZN16InterruptManager16handleException\num\()Ev
-_ZN16InterruptManager16handleException\num\()Ev:
+.global _ZN6cernos12hardwarecomm16InterruptManager16handleException\num\()Ev
+_ZN6cernos12hardwarecomm16InterruptManager16handleException\num\()Ev:
 	movb $\num, (interruptnum)
 	jmp int_bottom
 .endm
 
 .macro handleInterruptRequest num
-.global _ZN16InterruptManager26handleInterruptRequest\num\()Ev
-_ZN16InterruptManager26handleInterruptRequest\num\()Ev:
+.global _ZN6cernos12hardwarecomm16InterruptManager26handleInterruptRequest\num\()Ev
+_ZN6cernos12hardwarecomm16InterruptManager26handleInterruptRequest\num\()Ev:
 	movb $\num + IRQ_BASE, (interruptnum)
 	jmp int_bottom
 .endm
@@ -34,7 +34,7 @@ int_bottom:
 
 	pushl %esp
 	push (interruptnum)
-	call _ZN16InterruptManager15handleInterruptEhj
+	call _ZN6cernos12hardwarecomm16InterruptManager15handleInterruptEhj
 	# addl $5, %esp
 	movl %eax, %esp
 
@@ -45,7 +45,7 @@ int_bottom:
 	popa
 
 
-_ZN16InterruptManager22IgnoreInterruptRequestEv:
+_ZN6cernos12hardwarecomm16InterruptManager22IgnoreInterruptRequestEv:
 
 	iret
 

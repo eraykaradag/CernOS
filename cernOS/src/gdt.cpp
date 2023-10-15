@@ -1,4 +1,7 @@
-#include "gdt.h"
+#include <gdt.h>
+
+using namespace cernos;
+using namespace cernos::common;
 
 void printf(char* str);
 

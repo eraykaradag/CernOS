@@ -1,9 +1,15 @@
-#include "types.h"
-#include "driver.h"
-#include "keyboard.h"
-#include "gdt.h"
-#include "interrupts.h"
-#include "mouse.h"
+#include <common/types.h>
+#include <drivers/driver.h>
+#include <drivers/keyboard.h>
+#include <gdt.h>
+#include <hardwarecomm/interrupts.h>
+#include <hardwarecomm/pci.h>
+#include <drivers/mouse.h>
+
+using namespace cernos;
+using namespace cernos::common;
+using namespace cernos::drivers;
+using namespace cernos::hardwarecomm;
 
 static uint8_t x = 0 , y = 0;
 static uint16_t* VideoMemory = (uint16_t*) 0xb8000;
@@ -83,7 +89,7 @@ extern "C" void callConstructors()
 extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	
 
-	printf("=======++++++++***##%%%%%%%%%%**##****************\n");
+	/* printf("=======++++++++***##%%%%%%%%%%**##****************\n");
 	printf("======++*****##%%%%%%%%%@@@@%%***#****************\n");
 	printf("====+***#%%@@@@@@%@@%*#%%%@@@@%%*##**************#\n");
 	printf("==+*##%###%%%%%%@@%@*#%%%@@@@@@@%%##*************#\n");
@@ -101,15 +107,8 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	printf("#%@%#*##*%@@@@@@%*+=====+*****%##%%@@@@%%%########\n");
 	printf("=+*##%%%#@%%@@@%%#+=====+++*###%%@@@@%%@@@@%%#####\n");
 	printf("-=+#%@@@@%##%%#%@%*+====++++*%%%@@%%*#%@@@%**+=+*#\n");
-	printf("===+**#@@@####%@@@#+=======+#%%@@%###%%%%%++=====+\n");
+	printf("===+**#@@@####%@@@#+=======+#%%@@%###%%%%%++=====+\n"); */
 	//printf("======+#*#%%%%@@@@*========+*##%%%##**+++===-----+\n");
-
-
-
-
-
-
-	printf("cernOS ilk gosterim\n");
 
 	GlobalDescriptorTable gdt;
 	InterruptManager im(&gdt);
@@ -123,10 +122,13 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	MouseDriver mouse(&im);
 	dm.AddDriver(&mouse);
 
+	PCIController pci;
+	pci.SelectDrivers(&dm, &im);
+
 	dm.ActivateAll();
 
 	im.Activate();
 
 	while(1);
-		//VideoMemory[80*y+x] = ((VideoMemory[80*y+x] & 0xF000) >> 4) | ((VideoMemory[80*y+x] & 0x0F00) << 4) | ((VideoMemory[80*y+x] & 0x00FF));
+		VideoMemory[80*y+x] = ((VideoMemory[80*y+x] & 0xF000) >> 4) | ((VideoMemory[80*y+x] & 0x0F00) << 4) | ((VideoMemory[80*y+x] & 0x00FF));	
 }

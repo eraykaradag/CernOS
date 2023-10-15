@@ -1,71 +1,74 @@
-#ifndef __INTERRUPTS_H
-#define __INTERRUPTS_H
-	#include "types.h"
-	#include "port.h"
-	#include "gdt.h"
+#ifndef __CERNOS__HARDWARECOMM__INTERRUPTS_H
+#define __CERNOS__HARDWARECOMM__INTERRUPTS_H
+#include <common/types.h>
+#include <hardwarecomm/port.h>
+#include <gdt.h>
+namespace cernos{
+	namespace hardwarecomm{
+		class InterruptManager;
+
+		class InterruptHandler
+		{
+			protected:
+				cernos::common::uint8_t interruptNum;
+				InterruptManager* interruptManager;
+
+				InterruptHandler(cernos::common::uint8_t interruptNum, InterruptManager* interruptManager);
+				~InterruptHandler();
+			public:
+				virtual cernos::common::uint32_t handleInterrupt(cernos::common::uint32_t esp);
+
+		};
+		class InterruptManager
+		{
+			friend class InterruptHandler;
+			protected:
+				static InterruptManager* ActiveInterruptManager;
+				InterruptHandler* handlers[256];
+
+				struct GateDescriptor{
+					cernos::common::uint16_t handlerAddressLow;
+					cernos::common::uint16_t gdt_codeSegmentSelector;
+					cernos::common::uint8_t reserved;
+					cernos::common::uint8_t access;
+					cernos::common::uint16_t handlerAddressHigh;
+				} __attribute__((packed));
+
+				static GateDescriptor interruptDescriptorTable[256];
+
+				struct interruptDescriptorTablePointer{
+					cernos::common::uint16_t size;
+					cernos::common::uint32_t base;
+				}__attribute__((packed));
+
+				static void SetInterruptDescriptorTableEntry(cernos::common::uint8_t interruptNum, cernos::common::uint16_t codeSegmentSelectorOffset,void (*handler)(), cernos::common::uint8_t DescriptorAccessRights, cernos::common::uint8_t DescriptorType);
+
+
+				cernos::hardwarecomm::Port8bitSlow picMasterCmd;
+				cernos::hardwarecomm::Port8bitSlow picMasterData;
+				cernos::hardwarecomm::Port8bitSlow picWorkerCmd;
+				cernos::hardwarecomm::Port8bitSlow picWorkerData;
+			public:
+
+				InterruptManager(cernos::GlobalDescriptorTable* gdt);
+				~InterruptManager();
+
+				void Activate();
+				void Deactivate();
+
+				static cernos::common::uint32_t handleInterrupt(cernos::common::uint8_t interruptNum, cernos::common::uint32_t esp);
+				cernos::common::uint32_t DoHandleInterrupt(cernos::common::uint8_t interruptNum, cernos::common::uint32_t esp);
+
+
+				static void IgnoreInterruptRequest();
+				static void handleInterruptRequest0x00();
+				static void handleInterruptRequest0x01();
+				static void handleInterruptRequest0x0C();
+
+
+		};
+	}
+}
 	
-	class InterruptManager;
-
-	class InterruptHandler
-	{
-		protected:
-			uint8_t interruptNum;
-			InterruptManager* interruptManager;
-
-			InterruptHandler(uint8_t interruptNum, InterruptManager* interruptManager);
-			~InterruptHandler();
-		public:
-			virtual uint32_t handleInterrupt(uint32_t esp);
-
-	};
-	class InterruptManager
-	{
-		friend class InterruptHandler;
-		protected:
-			static InterruptManager* ActiveInterruptManager;
-			InterruptHandler* handlers[256];
-
-			struct GateDescriptor{
-				uint16_t handlerAddressLow;
-				uint16_t gdt_codeSegmentSelector;
-				uint8_t reserved;
-				uint8_t access;
-				uint16_t handlerAddressHigh;
-			} __attribute__((packed));
-
-			static GateDescriptor interruptDescriptorTable[256];
-
-			struct interruptDescriptorTablePointer{
-				uint16_t size;
-				uint32_t base;
-			}__attribute__((packed));
-
-			static void SetInterruptDescriptorTableEntry(uint8_t interruptNum, uint16_t codeSegmentSelectorOffset,void (*handler)(), uint8_t DescriptorAccessRights, uint8_t DescriptorType);
-
-
-			Port8bitSlow picMasterCmd;
-			Port8bitSlow picMasterData;
-			Port8bitSlow picWorkerCmd;
-			Port8bitSlow picWorkerData;
-		public:
-
-			InterruptManager(GlobalDescriptorTable* gdt);
-			~InterruptManager();
-
-			void Activate();
-			void Deactivate();
-
-			static uint32_t handleInterrupt(uint8_t interruptNum, uint32_t esp);
-			uint32_t DoHandleInterrupt(uint8_t interruptNum, uint32_t esp);
-
-
-			static void IgnoreInterruptRequest();
-			static void handleInterruptRequest0x00();
-			static void handleInterruptRequest0x01();
-			static void handleInterruptRequest0x0C();
-
-
-	};
-
 #endif
 

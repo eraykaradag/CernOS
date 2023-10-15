@@ -1,25 +1,31 @@
-#ifndef __DRIVER_H
-#define __DRIVER_H
-	class Driver{
-		public: 
-			Driver();
-			~Driver();
+#ifndef __CERNOS__DRIVERS__DRIVER_H
+#define __CERNOS__DRIVERS__DRIVER_H
 
-			virtual void Activate();
-			virtual int Reset();
-			virtual void Deactivate(); 
-	};
+namespace cernos{
+	namespace drivers{
+		class Driver{
+			public: 
+				Driver();
+				~Driver();
 
-	class DriverManager{
-	private:
-		Driver* drivers[255];
-		int numDrivers;
-	public:
-		DriverManager(int num);
-		void AddDriver(Driver*);
+				virtual void Activate();
+				virtual int Reset();
+				virtual void Deactivate(); 
+		};
 
-		void ActivateAll();
+		class DriverManager{
+		private:
+			Driver* drivers[255];
+			int numDrivers;
+		public:
+			DriverManager(int num);
+			void AddDriver(Driver*);
 
-	};
+			void ActivateAll();
+
+		};
+	}
+}
+	
 
 #endif

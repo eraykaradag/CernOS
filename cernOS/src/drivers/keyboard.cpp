@@ -1,5 +1,8 @@
-#include "keyboard.h"
+#include <drivers/keyboard.h>
 
+using namespace cernos::common;
+using namespace cernos::drivers;
+using namespace cernos::hardwarecomm;
 
 KeyboardEventHandler::KeyboardEventHandler(){
 }
