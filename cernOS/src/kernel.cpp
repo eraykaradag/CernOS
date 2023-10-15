@@ -5,6 +5,7 @@
 #include <hardwarecomm/interrupts.h>
 #include <hardwarecomm/pci.h>
 #include <drivers/mouse.h>
+#include <drivers/vga.h>
 
 using namespace cernos;
 using namespace cernos::common;
@@ -125,9 +126,19 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	PCIController pci;
 	pci.SelectDrivers(&dm, &im);
 
+	VideoGraphicsArray vga;
+
+
 	dm.ActivateAll();
 
 	im.Activate();
+
+	vga.SetMode(320,200,8);
+	for(uint32_t y = 0; y<200; y++){
+		for(uint32_t x = 0; x<320; x++){
+			vga.PutPixel(x,y,0x00,0x00,0xA8);
+		}
+	}
 
 	while(1);
 		VideoMemory[80*y+x] = ((VideoMemory[80*y+x] & 0xF000) >> 4) | ((VideoMemory[80*y+x] & 0x0F00) << 4) | ((VideoMemory[80*y+x] & 0x00FF));	
