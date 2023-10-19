@@ -85,9 +85,9 @@ bool VideoGraphicsArray::SetMode(uint32_t width,uint32_t height, uint32_t colord
     WriteRegisters(g_320x200x256);
     return true;
 }
-/*void VideoGraphicsArray::PutPixel(uint32_t x, uint32_t y,uint8_t r, uint8_t g, uint8_t b){
+void VideoGraphicsArray::PutPixel(uint32_t x, uint32_t y,uint8_t r, uint8_t g, uint8_t b){
     PutPixel(x,y,GetColorIndex(r,g,b));
-}*/
+}
 uint8_t* VideoGraphicsArray::GetFrameBufferSegment(){
     graphicsControllerIndexPort.Write(0x06);
     uint8_t segmentNumber = ((graphicsControllerDataPort.Read() >> 2) & 0x03);

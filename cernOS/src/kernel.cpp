@@ -135,9 +135,9 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	im.Activate();
 
 	vga.SetMode(320,200,8);
-	for(uint32_t h = 150; h<200; h++){
+	for(uint32_t h = 0; h<200; h++){
 		for(uint32_t w = 0; w<320; w++){
-			vga.PutPixel(w,h,img[320*h+w]);
+			vga.PutPixel(w,h,0x01);
 		}
 	}
 
