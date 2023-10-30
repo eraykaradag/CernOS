@@ -135,11 +135,7 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	im.Activate();
 
 	vga.SetMode(320,200,8);
-	for(uint32_t h = 0; h<200; h++){
-		for(uint32_t w = 0; w<320; w++){
-			vga.PutPixel(w,h,0x01);
-		}
-	}
+	vga.FillRectangle(0,0,320,200,0x00,0x00,0xA8);
 
 	while(1);
 		VideoMemory[80*y+x] = ((VideoMemory[80*y+x] & 0xF000) >> 4) | ((VideoMemory[80*y+x] & 0x0F00) << 4) | ((VideoMemory[80*y+x] & 0x00FF));	

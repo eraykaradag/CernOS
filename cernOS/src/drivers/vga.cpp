@@ -110,3 +110,10 @@ uint8_t VideoGraphicsArray::GetColorIndex(uint8_t r, uint8_t g, uint8_t b){
     }
 
 }
+void VideoGraphicsArray::FillRectangle(uint32_t x, uint32_t y,uint32_t w,uint32_t h,uint8_t r, uint8_t g, uint8_t b){
+    for(uint32_t Y = y; Y<y+h; Y++){
+		for(uint32_t X = 0; X<x+w; X++){
+			PutPixel(X,Y,r,g,b);
+		}
+	}
+}
