@@ -4,11 +4,30 @@ using namespace cernos::common;
 using namespace cernos::drivers;
 using namespace cernos::hardwarecomm;
 
-MouseDriver::MouseDriver(InterruptManager* interruptManager)
+
+
+MouseEventHandler::MouseEventHandler(){
+
+}
+void MouseEventHandler::OnActivate(){
+
+}
+void MouseEventHandler::OnMouseDown(uint8_t button){
+
+}
+void MouseEventHandler::OnMouseUp(uint8_t button){
+
+}
+void MouseEventHandler::OnMouseMove(int x, int y){
+
+}
+
+MouseDriver::MouseDriver(InterruptManager* interruptManager, MouseEventHandler* handler)
 :InterruptHandler(0x2C,interruptManager),
 dataPort(0x60),
 cmdPort(0x64)
 {
+	this->handler = handler;
 }
 
 MouseDriver::~MouseDriver()
@@ -18,8 +37,6 @@ MouseDriver::~MouseDriver()
 void MouseDriver::Activate(){
 	offset = 0;
 	buttons = 0;
-	uint16_t* VideoMemory = (uint16_t*) 0xb8000;
-	VideoMemory[80*12+40] = ((VideoMemory[80*12+40] & 0xF000) >> 4) | ((VideoMemory[80*12+40] & 0x0F00) << 4) | ((VideoMemory[80*12+40] & 0x00FF));	
 
 	cmdPort.Write(0xA8); // start sending keyboard interrupts
 	cmdPort.Write(0x20); //get curr state
@@ -41,10 +58,7 @@ uint32_t MouseDriver::handleInterrupt(uint32_t esp)
 {
 	uint8_t status = cmdPort.Read();
 
-	if(!(status&0x20)) return esp;
-
-	static int8_t x = 40, y = 12;
-
+	if((!(status&0x20)) || handler == 0) return esp;
 
 	buffer[offset] = dataPort.Read();
 	offset = (offset+1)%3;
@@ -52,23 +66,19 @@ uint32_t MouseDriver::handleInterrupt(uint32_t esp)
 	if(offset == 0){
 		static uint16_t* VideoMemory = (uint16_t*) 0xb8000;
 
-		VideoMemory[80*y+x] = ((VideoMemory[80*y+x] & 0xF000) >> 4) | ((VideoMemory[80*y+x] & 0x0F00) << 4) | ((VideoMemory[80*y+x] & 0x00FF));
+		if(buffer[1] != 0 || buffer[2] != 0){
+			handler->OnMouseMove((int)buffer[1], (int)buffer[2]);
+		}
 
-		x += buffer[1];
-
-		if(x<0) x = 0;
-		if(x>= 80) x = 79;
-
-		y -= buffer[2];
-
-		if(y<0) y = 0;
-		if(y>= 25) y = 24;
-	
-		VideoMemory[80*y+x] = ((VideoMemory[80*y+x] & 0xF000) >> 4) | ((VideoMemory[80*y+x] & 0x0F00) << 4) | ((VideoMemory[80*y+x] & 0x00FF));
-
+		
 		for(uint8_t i = 0; i < 3; i++){
 			if((buffer[0] & (0x01<<i)) != (buttons & (0x01 << i))){
-				//...
+				if(buttons & (0x1<<i)){
+					handler->OnMouseUp(i+1);
+				}
+				else{
+					handler->OnMouseDown(i+1);
+				}
 			}
 		}
 		buttons = buffer[0];

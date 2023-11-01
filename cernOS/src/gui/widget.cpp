@@ -3,7 +3,9 @@
 using namespace cernos::common;
 using namespace cernos::gui;
 
-Widget::Widget(Widget* parent,uint32_t x,uint32_t y,uint32_t w,uint32_t h,uint8_t r,uint8_t g,uint8_t b){
+Widget::Widget(Widget* parent,uint32_t x,uint32_t y,uint32_t w,uint32_t h,uint8_t r,uint8_t g,uint8_t b)
+: KeyboardEventHandler()
+{
     this->parent = parent;
     this->x = x;
     this->y = y;
@@ -35,7 +37,7 @@ void Widget::Draw(GraphicsContext* gc){
     ModelToScreen(X,Y);
     gc->FillRectangle(X,Y,w,h,r,g,b);
 }
-void Widget::OnMouseDown(uint32_t x,uint32_t y){
+void Widget::OnMouseDown(uint32_t x,uint32_t y, uint8_t button){
     if(Focussable)
         GetFocus(this);
 }
@@ -43,16 +45,10 @@ void Widget::OnMouseDown(uint32_t x,uint32_t y){
 bool Widget::ContainsCoordinate(uint32_t x,uint32_t y){
     return this->x <= x && x < this->x + this->w && this->y <= y && y < this->y + this->h;
 }
-void Widget::OnMouseUp(uint32_t x,uint32_t y){
+void Widget::OnMouseUp(uint32_t x,uint32_t y,uint8_t button){
 
 }
 void Widget::OnMouseMove(uint32_t oldx,uint32_t oldy,uint32_t newx,uint32_t newy){
-
-}
-void Widget::OnKeyDown(char* str){
-
-}
-void Widget::OnKeyUp(char* str){
 
 }
 
@@ -66,6 +62,14 @@ CompositeWidget::CompositeWidget(Widget* parent,uint32_t x,uint32_t y,uint32_t w
 CompositeWidget::~CompositeWidget(){
 
 }
+bool CompositeWidget::AddChild(Widget* child){
+    if(numChildren >= 100){
+        return false;
+    }
+    Children[numChildren++] = child;
+    return true;
+}
+
 void CompositeWidget::GetFocus(Widget* widget){
     this->focussedChild = widget;
     if(parent != 0)
@@ -77,18 +81,18 @@ void CompositeWidget::Draw(GraphicsContext* gc){
         Children[i]->Draw(gc);
     }
 }
-void CompositeWidget::OnMouseDown(uint32_t x,uint32_t y){
+void CompositeWidget::OnMouseDown(uint32_t x,uint32_t y,uint8_t button){
     for(int i = 0; i <numChildren; i++){
         if(Children[i]->ContainsCoordinate(x-this->x,y - this->y)){
-            Children[i]->OnMouseDown(x-this->x,y - this->y);
+            Children[i]->OnMouseDown(x-this->x,y - this->y,button);
             break;
         }
     }
 }
-void CompositeWidget::OnMouseUp(uint32_t x,uint32_t y){
+void CompositeWidget::OnMouseUp(uint32_t x,uint32_t y,uint8_t button){
     for(int i = 0; i <numChildren; i++){
         if(Children[i]->ContainsCoordinate(x-this->x,y - this->y)){
-            Children[i]->OnMouseUp(x-this->x,y - this->y);
+            Children[i]->OnMouseUp(x-this->x,y - this->y,button);
             break;
         }
     }
@@ -110,11 +114,11 @@ void CompositeWidget::OnMouseMove(uint32_t oldx,uint32_t oldy,uint32_t newx,uint
         }
     }
 }
-void CompositeWidget::OnKeyDown(char* str){
+void CompositeWidget::OnKeyDown(char str){
     if(focussedChild != 0)
         focussedChild->OnKeyDown(str);
 }
-void CompositeWidget::OnKeyUp(char* str){
+void CompositeWidget::OnKeyUp(char str){
     if(focussedChild != 0)
         focussedChild->OnKeyUp(str);
 }

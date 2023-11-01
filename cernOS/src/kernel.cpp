@@ -74,7 +74,33 @@ public:
 		printf(foo);
 	}
 };
+class MouseToConsole : public MouseEventHandler{
+	uint8_t x,y;
+	public:
+		MouseToConsole(){
+			uint16_t* VideoMemory = (uint16_t*) 0xb8000;
+			x = 40;
+			y = 12;
+			VideoMemory[80*12+40] = ((VideoMemory[80*12+40] & 0xF000) >> 4) | ((VideoMemory[80*12+40] & 0x0F00) << 4) | ((VideoMemory[80*12+40] & 0x00FF));	
 
+		}
+		void OnMouseMove(int xoffset, int yoffset){
+			
+			VideoMemory[80*y+x] = ((VideoMemory[80*y+x] & 0xF000) >> 4) | ((VideoMemory[80*y+x] & 0x0F00) << 4) | ((VideoMemory[80*y+x] & 0x00FF));
+
+				x += xoffset;
+
+				if(x<0) x = 0;
+				if(x>= 80) x = 79;
+
+				y -= yoffset;
+
+				if(y<0) y = 0;
+				if(y>= 25) y = 24;
+			
+				VideoMemory[80*y+x] = ((VideoMemory[80*y+x] & 0xF000) >> 4) | ((VideoMemory[80*y+x] & 0x0F00) << 4) | ((VideoMemory[80*y+x] & 0x00FF));
+	}
+};
 
 
 typedef void (*constructor)();
@@ -121,7 +147,8 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	KeyboardDriver keyboard(&im, &kbhandler);
 	dm.AddDriver(&keyboard);
 
-	MouseDriver mouse(&im);
+	MouseToConsole mousehandler;
+	MouseDriver mouse(&im,&mousehandler);
 	dm.AddDriver(&mouse);
 
 	PCIController pci;

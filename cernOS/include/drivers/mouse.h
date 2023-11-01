@@ -6,7 +6,16 @@
 #include <drivers/driver.h>
 namespace cernos{
 	namespace drivers{
-		
+		class MouseEventHandler{
+			cernos::common::uint8_t x;
+			cernos::common::uint8_t y;
+			public:
+				MouseEventHandler();
+				virtual void OnActivate();
+				virtual void OnMouseDown(cernos::common::uint8_t button);
+				virtual void OnMouseUp(cernos::common::uint8_t button);
+				virtual void OnMouseMove(int x, int y);
+		};
 
 		class MouseDriver : public cernos::hardwarecomm::InterruptHandler, public Driver
 		{
@@ -16,8 +25,10 @@ namespace cernos{
 			cernos::common::uint8_t buffer[3];
 			cernos::common::uint8_t offset;
 			cernos::common::uint8_t buttons;
+			
+			MouseEventHandler* handler;
 			public:
-				MouseDriver(cernos::hardwarecomm::InterruptManager* interruptManager);
+				MouseDriver(cernos::hardwarecomm::InterruptManager* interruptManager,MouseEventHandler* handler);
 				~MouseDriver();
 				virtual cernos::common::uint32_t handleInterrupt(cernos::common::uint32_t esp);
 				virtual void Activate();
