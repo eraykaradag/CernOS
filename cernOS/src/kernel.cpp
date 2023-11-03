@@ -7,11 +7,16 @@
 #include <drivers/mouse.h>
 #include <drivers/vga.h>
 #include <common/img.h>
+#include <gui/desktop.h>
+#include <gui/window.h>
+
+#define GRAPHICSMODE
 
 using namespace cernos;
 using namespace cernos::common;
 using namespace cernos::drivers;
 using namespace cernos::hardwarecomm;
+using namespace cernos::gui;
 
 static uint8_t x = 0 , y = 0;
 static uint16_t* VideoMemory = (uint16_t*) 0xb8000;
@@ -141,29 +146,49 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	GlobalDescriptorTable gdt;
 	InterruptManager im(&gdt);
 	
-	DriverManager dm(0);
+	Desktop desktop(320,200,0x00,0x00,0xA8);
 
+	DriverManager dm(0);
+#ifndef GRAPHICSMODE
 	PrintfKeyboardEventHandler kbhandler;
 	KeyboardDriver keyboard(&im, &kbhandler);
+#endif
+#ifdef GRAPHICSMODE
+	KeyboardDriver keyboard(&im, &desktop);
+#endif
 	dm.AddDriver(&keyboard);
 
+#ifndef GRAPHICSMODE
 	MouseToConsole mousehandler;
 	MouseDriver mouse(&im,&mousehandler);
+#endif
+#ifdef GRAPHICSMODE
+	MouseDriver mouse(&im,&desktop);
+#endif
 	dm.AddDriver(&mouse);
 
 	PCIController pci;
 	pci.SelectDrivers(&dm, &im);
-
+#ifdef GRAPHICSMODE
 	VideoGraphicsArray vga;
-
+#endif
 
 	dm.ActivateAll();
-
+#ifdef GRAPHICSMODE
+	vga.SetMode(320,200,8);
+	Window win1(&desktop,10,10,20,20,0XA8,0X00,0X00);
+	desktop.AddChild(&win1);
+	Window win2(&desktop,40,15,30,30,0x00,0XA8,0X00);
+	desktop.AddChild(&win2);
+#endif
 	im.Activate();
 
-	vga.SetMode(320,200,8);
-	vga.FillRectangle(0,0,320,200,0x00,0x00,0xA8);
 
-	while(1);
-		VideoMemory[80*y+x] = ((VideoMemory[80*y+x] & 0xF000) >> 4) | ((VideoMemory[80*y+x] & 0x0F00) << 4) | ((VideoMemory[80*y+x] & 0x00FF));	
+	while(1){
+		#ifdef GRAPHICSMODE
+		desktop.Draw(&vga);
+		#endif
+	}
+		
+			
 }
