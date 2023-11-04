@@ -17,6 +17,7 @@ _ZN6cernos12hardwarecomm16InterruptManager16handleException\num\()Ev:
 .global _ZN6cernos12hardwarecomm16InterruptManager26handleInterruptRequest\num\()Ev
 _ZN6cernos12hardwarecomm16InterruptManager26handleInterruptRequest\num\()Ev:
 	movb $\num + IRQ_BASE, (interruptnum)
+	pushl $0
 	jmp int_bottom
 .endm
 
@@ -26,24 +27,43 @@ handleInterruptRequest 0x0C
 
 int_bottom:
 	
-	pusha
-	pushl %ds
-	pushl %es
-	pushl %fs
-	pushl %gs
+	#pusha
+	#pushl %ds
+	#pushl %es
+	#pushl %fs
+	#pushl %gs
+
+	pushl %ebp
+	pushl %edi
+	pushl %esi
+
+	pushl %edx
+	pushl %ecx
+	pushl %ebx
+	pushl %eax
 
 	pushl %esp
 	push (interruptnum)
 	call _ZN6cernos12hardwarecomm16InterruptManager15handleInterruptEhj
-	# addl $5, %esp
+	#addl $5, %esp
 	movl %eax, %esp
 
-	popl %gs
-	popl %fs
-	popl %es
-	popl %ds
-	popa
+	popl %eax
+	popl %ebx
+	popl %ecx
+	popl %edx
 
+	popl %esi
+	popl %edi
+	popl %ebp
+	
+	#popl %gs
+	#popl %fs
+	#popl %es
+	#popl %ds
+	#popa
+
+	add $4, %esp
 
 _ZN6cernos12hardwarecomm16InterruptManager22IgnoreInterruptRequestEv:
 

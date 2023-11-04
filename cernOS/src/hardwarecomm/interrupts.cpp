@@ -1,5 +1,6 @@
 #include <hardwarecomm/interrupts.h>
 
+using namespace cernos;
 using namespace cernos::common;
 using namespace cernos::hardwarecomm;
 
@@ -37,8 +38,9 @@ void InterruptManager::SetInterruptDescriptorTableEntry(uint8_t interruptNum, ui
 	interruptDescriptorTable[interruptNum].reserved = 0;
 }
 
-InterruptManager::InterruptManager(GlobalDescriptorTable* gdt) : picMasterCmd(0x20), picMasterData(0x21),picWorkerCmd(0xA0), picWorkerData(0xA1)
+InterruptManager::InterruptManager(GlobalDescriptorTable* gdt, TaskManager* taskManager) : picMasterCmd(0x20), picMasterData(0x21),picWorkerCmd(0xA0), picWorkerData(0xA1)
 {
+	this->taskManager = taskManager;
 	uint16_t codeSegment = gdt->CodeSegmentSelector();
 	const uint8_t IDT_INTERRUPT_GATE = 0xE;
 
@@ -112,6 +114,11 @@ uint32_t InterruptManager::DoHandleInterrupt(uint8_t interruptNum, uint32_t esp)
 		printf("UNHANDLED INTERRUPT 0x");
 		printfHex(interruptNum);
 	}
+
+	if(interruptNum == 0x20){
+		esp = (uint32_t)taskManager->Schedule((CPUState*)esp);
+	}
+
 	if(0x20 <= interruptNum && interruptNum < 0x30){
 		picMasterCmd.Write(0x20);
 

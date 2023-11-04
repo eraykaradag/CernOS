@@ -9,8 +9,9 @@
 #include <common/img.h>
 #include <gui/desktop.h>
 #include <gui/window.h>
+#include <multitasking.h>
 
-#define GRAPHICSMODE
+//#define GRAPHICSMODE
 
 using namespace cernos;
 using namespace cernos::common;
@@ -108,6 +109,16 @@ class MouseToConsole : public MouseEventHandler{
 };
 
 
+void taskA(){
+	while(true) printf("A");
+}
+void taskB(){
+	while(true) printf("B");
+}
+
+
+
+
 typedef void (*constructor)();
 extern "C" constructor start_ctors;
 extern "C" constructor end_ctors;
@@ -144,7 +155,14 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	//printf("======+#*#%%%%@@@@*========+*##%%%##**+++===-----+\n");
 
 	GlobalDescriptorTable gdt;
-	InterruptManager im(&gdt);
+
+	TaskManager taskManager;
+	Task task1(&gdt, taskA);
+	Task task2(&gdt, taskB);
+	taskManager.AddTask(&task1);
+	taskManager.AddTask(&task2);
+
+	InterruptManager im(&gdt, &taskManager);
 	
 	Desktop desktop(320,200,0x00,0x00,0xA8);
 

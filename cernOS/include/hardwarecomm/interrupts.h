@@ -3,6 +3,7 @@
 #include <common/types.h>
 #include <hardwarecomm/port.h>
 #include <gdt.h>
+#include <multitasking.h>
 namespace cernos{
 	namespace hardwarecomm{
 		class InterruptManager;
@@ -25,6 +26,7 @@ namespace cernos{
 			protected:
 				static InterruptManager* ActiveInterruptManager;
 				InterruptHandler* handlers[256];
+				TaskManager* taskManager;
 
 				struct GateDescriptor{
 					cernos::common::uint16_t handlerAddressLow;
@@ -50,7 +52,7 @@ namespace cernos{
 				cernos::hardwarecomm::Port8bitSlow picWorkerData;
 			public:
 
-				InterruptManager(cernos::GlobalDescriptorTable* gdt);
+				InterruptManager(cernos::GlobalDescriptorTable* gdt, cernos::TaskManager* taskManager);
 				~InterruptManager();
 
 				void Activate();
