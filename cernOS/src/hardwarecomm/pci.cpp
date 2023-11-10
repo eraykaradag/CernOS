@@ -97,7 +97,7 @@ void PCIController::SelectDrivers(DriverManager* dm, InterruptManager* im){
 }
 
 Driver* PCIController::GetDriver(PCIDeviceDescriptor dev,InterruptManager* im){
- 
+    Driver* driver = 0;
     switch(dev.vendor_id){
         case 0x1022:// AMD
             switch(dev.device_id){
@@ -121,7 +121,7 @@ Driver* PCIController::GetDriver(PCIDeviceDescriptor dev,InterruptManager* im){
             break;
     }
 
-    return 0;
+    return driver;
 }
 
 BaseAddressRegister PCIController::GetBaseAddressRegister(cernos::common::uint16_t bus, cernos::common::uint16_t device, cernos::common::uint16_t func, cernos::common::uint16_t bar){

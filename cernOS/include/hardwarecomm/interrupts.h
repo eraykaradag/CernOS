@@ -4,6 +4,7 @@
 #include <hardwarecomm/port.h>
 #include <gdt.h>
 #include <multitasking.h>
+
 namespace cernos{
 	namespace hardwarecomm{
 		class InterruptManager;

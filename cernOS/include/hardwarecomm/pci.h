@@ -1,10 +1,10 @@
 #ifndef __CERNOS__HARDWARECOMM__PCI_H
 #define __CERNOS__HARDWARECOMM__PCI_H
-    #include <common/types.h>
-    #include <hardwarecomm/port.h>
-    #include <hardwarecomm/interrupts.h>
-    #include <drivers/driver.h>
-
+#include <common/types.h>
+#include <hardwarecomm/port.h>
+#include <hardwarecomm/interrupts.h>
+#include <drivers/driver.h>
+#include <memorymanagement.h>
 namespace cernos{
     namespace hardwarecomm{
 

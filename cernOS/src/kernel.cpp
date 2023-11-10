@@ -2,6 +2,7 @@
 #include <drivers/driver.h>
 #include <drivers/keyboard.h>
 #include <gdt.h>
+#include <memorymanagement.h>
 #include <hardwarecomm/interrupts.h>
 #include <hardwarecomm/pci.h>
 #include <drivers/mouse.h>
@@ -156,11 +157,17 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 
 	GlobalDescriptorTable gdt;
 
+	uint32_t* memupper = (uint32_t*)(((size_t)multiboot_structure) + 8);
+	size_t heap = 10*1024*1024; //10MiB
+	MemoryManager memoryManager(heap, (*memupper)*1024 - heap - 10*1024);
+
+	void* allocated = memoryManager.malloc(1024);
+
 	TaskManager taskManager;
-	Task task1(&gdt, taskA);
+	/*Task task1(&gdt, taskA);
 	Task task2(&gdt, taskB);
 	taskManager.AddTask(&task1);
-	taskManager.AddTask(&task2);
+	taskManager.AddTask(&task2);*/
 
 	InterruptManager im(&gdt, &taskManager);
 	
