@@ -1,4 +1,5 @@
 #include <hardwarecomm/pci.h>
+#include <drivers/amd_am79c973.h>
 
 using namespace cernos::common;
 using namespace cernos::drivers;
@@ -67,12 +68,13 @@ void PCIController::SelectDrivers(DriverManager* dm, InterruptManager* im){
                     BaseAddressRegister bar = GetBaseAddressRegister(bus,device,func,barNum);
                     if(bar.address && (bar.type == InputOutput))
                         dev.portBase = (uint32_t)bar.address;
-                    
-                    Driver* driver = GetDriver(dev,im);
-                    if(driver != 0)
-                        dm->AddDriver(driver);
                 }
-                printf("PCI BUS ");
+                Driver* driver = GetDriver(dev,im);
+                if(driver != 0)
+                    dm->AddDriver(driver);
+
+
+                /*printf("PCI BUS ");
                 printfHex(bus & 0xFF);
 
                 printf(", DEVICE ");
@@ -88,7 +90,7 @@ void PCIController::SelectDrivers(DriverManager* dm, InterruptManager* im){
                 printfHex((dev.device_id & 0xFF00) >> 8);
                 printfHex(dev.device_id & 0xFF);
 
-                printf("\n");
+                printf("\n");*/
                 
 
             }
@@ -102,12 +104,17 @@ Driver* PCIController::GetDriver(PCIDeviceDescriptor dev,InterruptManager* im){
         case 0x1022:// AMD
             switch(dev.device_id){
                 case 0x2000: //am79c973
-                    printf("AMD am79c973");
+                    printf("AMD am79c973 CALISIYOR LANN \n");
+                    driver = (Driver*)MemoryManager::activeMemoryManager->malloc(sizeof(amd_am79c973));
+                    printf("memory allocated \n");
+                    if(driver != 0)
+                        new (driver) amd_am79c973(&dev,im);
+                    return driver;
                     break;
             }
             break;
         case 0x8086: //intel
-            printf("INTEL");
+            //printf("INTEL \n");
             break;
     }
 
@@ -115,7 +122,7 @@ Driver* PCIController::GetDriver(PCIDeviceDescriptor dev,InterruptManager* im){
         case 0x03: //graphics
             switch(dev.subclass_id){
                 case 0x00: //VGA
-                    printf("VGA");
+                    //printf("VGA\n");
                     break;
             }
             break;
@@ -133,7 +140,7 @@ BaseAddressRegister PCIController::GetBaseAddressRegister(cernos::common::uint16
         return result;
     }
     uint32_t bar_value = Read(bus, device,func,0x10+4*bar);
-    result.type = bar_value & 0x1 ? InputOutput : MemoryMapping;
+    result.type = (bar_value & 0x1) ? InputOutput : MemoryMapping;
     uint32_t temp;
 
     if(result.type == MemoryMapping){

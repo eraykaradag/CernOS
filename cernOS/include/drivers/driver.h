@@ -14,7 +14,7 @@ namespace cernos{
 		};
 
 		class DriverManager{
-		private:
+		public:
 			Driver* drivers[255];
 			int numDrivers;
 		public:

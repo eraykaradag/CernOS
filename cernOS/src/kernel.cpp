@@ -11,6 +11,7 @@
 #include <gui/desktop.h>
 #include <gui/window.h>
 #include <multitasking.h>
+#include <drivers/amd_am79c973.h>
 
 //#define GRAPHICSMODE
 
@@ -170,25 +171,23 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	taskManager.AddTask(&task2);*/
 
 	InterruptManager im(&gdt, &taskManager);
-	
+#ifdef GRAPHICSMODE
 	Desktop desktop(320,200,0x00,0x00,0xA8);
-
+#endif
 	DriverManager dm(0);
-#ifndef GRAPHICSMODE
+#ifdef GRAPHICSMODE
+	KeyboardDriver keyboard(&im, &desktop);
+#else
 	PrintfKeyboardEventHandler kbhandler;
 	KeyboardDriver keyboard(&im, &kbhandler);
 #endif
-#ifdef GRAPHICSMODE
-	KeyboardDriver keyboard(&im, &desktop);
-#endif
 	dm.AddDriver(&keyboard);
 
-#ifndef GRAPHICSMODE
-	MouseToConsole mousehandler;
-	MouseDriver mouse(&im,&mousehandler);
-#endif
 #ifdef GRAPHICSMODE
 	MouseDriver mouse(&im,&desktop);
+#else
+	MouseToConsole mousehandler;
+	MouseDriver mouse(&im,&mousehandler);
 #endif
 	dm.AddDriver(&mouse);
 
@@ -197,7 +196,6 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 #ifdef GRAPHICSMODE
 	VideoGraphicsArray vga;
 #endif
-
 	dm.ActivateAll();
 #ifdef GRAPHICSMODE
 	vga.SetMode(320,200,8);
@@ -206,12 +204,15 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	Window win2(&desktop,40,15,30,30,0x00,0XA8,0X00);
 	desktop.AddChild(&win2);
 #endif
+
+	amd_am79c973* eth0 = (amd_am79c973*)(dm.drivers[2]);
+	eth0->Send((uint8_t*)"Hello network",13);
 	im.Activate();
 
 
 	while(1){
 		#ifdef GRAPHICSMODE
-		desktop.Draw(&vga);
+			desktop.Draw(&vga);
 		#endif
 	}
 		

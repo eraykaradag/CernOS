@@ -5,6 +5,7 @@
 #include <hardwarecomm/interrupts.h>
 #include <drivers/driver.h>
 #include <memorymanagement.h>
+
 namespace cernos{
     namespace hardwarecomm{
 
