@@ -21,9 +21,26 @@ _ZN6cernos12hardwarecomm16InterruptManager26handleInterruptRequest\num\()Ev:
 	jmp int_bottom
 .endm
 
+
 handleInterruptRequest 0x00
 handleInterruptRequest 0x01
+handleInterruptRequest 0x02
+handleInterruptRequest 0x03
+handleInterruptRequest 0x04
+handleInterruptRequest 0x05
+handleInterruptRequest 0x06
+handleInterruptRequest 0x07
+handleInterruptRequest 0x08
+handleInterruptRequest 0x09
+handleInterruptRequest 0x0A
+handleInterruptRequest 0x0B
 handleInterruptRequest 0x0C
+handleInterruptRequest 0x0D
+handleInterruptRequest 0x0E
+handleInterruptRequest 0x0F
+handleInterruptRequest 0x31
+
+handleInterruptRequest 0x80
 
 int_bottom:
 	

@@ -64,9 +64,47 @@ namespace cernos{
 
 
 				static void IgnoreInterruptRequest();
+
 				static void handleInterruptRequest0x00();
-				static void handleInterruptRequest0x01();
-				static void handleInterruptRequest0x0C();
+                static void handleInterruptRequest0x01();
+                static void handleInterruptRequest0x02();
+                static void handleInterruptRequest0x03();
+                static void handleInterruptRequest0x04();
+                static void handleInterruptRequest0x05();
+                static void handleInterruptRequest0x06();
+                static void handleInterruptRequest0x07();
+                static void handleInterruptRequest0x08();
+                static void handleInterruptRequest0x09();
+                static void handleInterruptRequest0x0A();
+                static void handleInterruptRequest0x0B();
+                static void handleInterruptRequest0x0C();
+                static void handleInterruptRequest0x0D();
+                static void handleInterruptRequest0x0E();
+                static void handleInterruptRequest0x0F();
+                static void handleInterruptRequest0x31();
+
+                static void handleInterruptRequest0x80();
+
+                /*static void handleException0x00();
+                static void handleException0x01();
+                static void handleException0x02();
+                static void handleException0x03();
+                static void handleException0x04();
+                static void handleException0x05();
+                static void handleException0x06();
+                static void handleException0x07();
+                static void handleException0x08();
+                static void handleException0x09();
+                static void handleException0x0A();
+                static void handleException0x0B();
+                static void handleException0x0C();
+                static void handleException0x0D();
+                static void handleException0x0E();
+                static void handleException0x0F();
+                static void handleException0x10();
+                static void handleException0x11();
+                static void handleException0x12();
+                static void handleException0x13();*/
 
 
 		};

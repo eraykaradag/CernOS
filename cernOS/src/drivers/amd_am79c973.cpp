@@ -6,7 +6,7 @@ using namespace cernos::drivers;
 using namespace cernos::hardwarecomm;
 
 void printf(char*);
-void printf(uint8_t);
+void printfHex(uint8_t);
 amd_am79c973::amd_am79c973(PCIDeviceDescriptor *dev, InterruptManager* im)
 : Driver(), InterruptHandler(dev->interrupt + 0x20,im),
 MACAddress0Port(dev->portBase),
