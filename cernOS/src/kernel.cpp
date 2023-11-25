@@ -7,6 +7,7 @@
 #include <hardwarecomm/pci.h>
 #include <drivers/mouse.h>
 #include <drivers/vga.h>
+#include <drivers/ata.h>
 #include <common/img.h>
 #include <gui/desktop.h>
 #include <gui/window.h>
@@ -205,8 +206,23 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	desktop.AddChild(&win2);
 #endif
 
-	amd_am79c973* eth0 = (amd_am79c973*)(dm.drivers[2]);
+	//interrupt num 14
+	AdvancedTechnologyAttachment ata0m(0x1F0,true);
+	printf("ATA PRIMARY MASTER: ");ata0m.Identify();
+	AdvancedTechnologyAttachment ata0s(0x1F0,false);
+	printf("ATA PRIMARY SLAVE: ");ata0s.Identify();
+	
+	char* buffer = "cernOS";
+	ata0m.Write28(0,(uint8_t*)buffer,6);
+	ata0m.Flush();
+
+	ata0m.Read28(0,(uint8_t*)buffer,6);
+	//interrupt num 15
+	AdvancedTechnologyAttachment ata1m(0x170,true);
+	AdvancedTechnologyAttachment ata1s(0x170,false);
+	/* amd_am79c973* eth0 = (amd_am79c973*)(dm.drivers[2]);
 	eth0->Send((uint8_t*)"Hello network",13);
+	 */
 	im.Activate();
 
 
