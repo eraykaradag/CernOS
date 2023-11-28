@@ -4,6 +4,7 @@
 #include <gdt.h>
 #include <memorymanagement.h>
 #include <hardwarecomm/interrupts.h>
+#include <syscalls.h>
 #include <hardwarecomm/pci.h>
 #include <drivers/mouse.h>
 #include <drivers/vga.h>
@@ -111,12 +112,14 @@ class MouseToConsole : public MouseEventHandler{
 	}
 };
 
-
+void sysprintf(char* str){
+	asm("int $0x80" : : "a" (4), "b" (str));
+}
 void taskA(){
-	while(true) printf("A");
+	while(true) sysprintf("A");
 }
 void taskB(){
-	while(true) printf("B");
+	while(true) sysprintf("B");
 }
 
 
@@ -166,12 +169,14 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	void* allocated = memoryManager.malloc(1024);
 
 	TaskManager taskManager;
-	/*Task task1(&gdt, taskA);
+	Task task1(&gdt, taskA);
 	Task task2(&gdt, taskB);
 	taskManager.AddTask(&task1);
-	taskManager.AddTask(&task2);*/
+	taskManager.AddTask(&task2);
 
 	InterruptManager im(&gdt, &taskManager);
+
+	SysCallHandler syscalls(0x80,&im);
 #ifdef GRAPHICSMODE
 	Desktop desktop(320,200,0x00,0x00,0xA8);
 #endif
