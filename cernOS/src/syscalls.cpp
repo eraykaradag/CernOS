@@ -17,7 +17,7 @@ void printf(char*);
 uint32_t SysCallHandler::handleInterrupt(uint32_t esp){
     CPUState* cpu = (CPUState*)esp;
 
-    switch(cpu->eax){//implement all syscalls in here
+    switch(cpu->eax){// TODO:implement all syscalls in here
         case 4:
             printf((char*)cpu->ebx);
             break;

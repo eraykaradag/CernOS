@@ -9,6 +9,7 @@
 #include <drivers/mouse.h>
 #include <drivers/vga.h>
 #include <drivers/ata.h>
+#include <filesystem/msdospart.h>
 #include <common/img.h>
 #include <gui/desktop.h>
 #include <gui/window.h>
@@ -20,6 +21,7 @@
 using namespace cernos;
 using namespace cernos::common;
 using namespace cernos::drivers;
+using namespace cernos::filesystem;
 using namespace cernos::hardwarecomm;
 using namespace cernos::gui;
 
@@ -169,10 +171,10 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	void* allocated = memoryManager.malloc(1024);
 
 	TaskManager taskManager;
-	Task task1(&gdt, taskA);
+	/*Task task1(&gdt, taskA);
 	Task task2(&gdt, taskB);
 	taskManager.AddTask(&task1);
-	taskManager.AddTask(&task2);
+	taskManager.AddTask(&task2);*/
 
 	InterruptManager im(&gdt, &taskManager);
 
@@ -217,11 +219,13 @@ extern "C" void kernelMain(const void* multiboot_structure, uint32_t magicnum){
 	AdvancedTechnologyAttachment ata0s(0x1F0,false);
 	printf("ATA PRIMARY SLAVE: ");ata0s.Identify();
 	
+
+	MSDOSPartitionTable::ReadPartitions(&ata0m);
 	char* buffer = "cernOS";
-	ata0m.Write28(0,(uint8_t*)buffer,6);
+	/*ata0m.Write28(0,(uint8_t*)buffer,6);
 	ata0m.Flush();
 
-	ata0m.Read28(0,(uint8_t*)buffer,6);
+	ata0m.Read28(0,(uint8_t*)buffer,6);*/
 	//interrupt num 15
 	AdvancedTechnologyAttachment ata1m(0x170,true);
 	AdvancedTechnologyAttachment ata1s(0x170,false);
